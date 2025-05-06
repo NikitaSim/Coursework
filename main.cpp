@@ -1,11 +1,22 @@
-#include <SFML/Graphics.hpp>
-//#include <algorithm>
+Ôªø#include <SFML/Graphics.hpp>
+#include <algorithm>
 #include <ctime>
+#include <iostream>
 #include "Point.h"
 #include "Func.h"
 #include "ConvexNGon.h"
 
 int main() {
+
+	ConvexNGon shape(8, 100.f);
+	sf::ConvexShape polygon = shape.createConvexNGon({ 400, 300 });
+
+	// –ü—Ä–æ–≤–µ—Ä–∫–∞ —Ç–æ—á–µ–∫
+	const auto& points = shape.getHullPoints();
+	std::cout << "Hull points (" << points.size() << "):" << std::endl;
+	for (const auto& p : points) {
+		std::cout << "X: " << p.x << ", Y: " << p.y << std::endl;
+	}
 
 	int length = 800; //x
 	int	width = 600; //y
@@ -15,25 +26,32 @@ int main() {
 
 	srand(time(0));
 	int side = rand() % (15 - 3 + 1) + 3;
-	float radius = 50.f + (rand() % 50);
 
-	// «‡‰‡ÂÏ ·ÂÁÓÔ‡ÒÌ˚Â „‡ÌËˆ˚ ‰Îˇ ˆÂÌÚ‡ ÙË„Û˚
-	float safePadding = 100.f; // ÃËÌËÏ‡Î¸ÌÓÂ ‡ÒÒÚÓˇÌËÂ ÓÚ Í‡Â‚ ˝Í‡Ì‡
+	//// –ó–∞–¥–∞–µ–º –±–µ–∑–æ–ø–∞—Å–Ω—ã–µ –≥—Ä–∞–Ω–∏—Ü—ã –¥–ª—è —Ü–µ–Ω—Ç—Ä–∞ —Ñ–∏–≥—É—Ä—ã
+	float safePadding = 100.f; // –ú–∏–Ω–∏–º–∞–ª—å–Ω–æ–µ —Ä–∞—Å—Å—Ç–æ—è–Ω–∏–µ –æ—Ç –∫—Ä–∞–µ–≤ —ç–∫—Ä–∞–Ω–∞
 
-	// √ÂÌÂ‡ˆËˇ ÍÓÓ‰ËÌ‡Ú ˆÂÌÚ‡ Ò Û˜ÂÚÓÏ ‡‰ËÛÒ‡
-	float X_rand = rand() % ((length / 2) - 2 * static_cast<int>(safePadding)) + safePadding;
-	float Y_rand = rand() % (width - 2 * static_cast<int>(safePadding)) + safePadding;
+	// –ì–µ–Ω–µ—Ä–∞—Ü–∏—è —Ä–∞–¥–∏—É—Å–æ–≤ (–Ω–µ –±–æ–ª—å—à–µ safePadding)
+	float radius_1 = 30.f + rand() % 70; // 30-100
+	float radius_2 = 30.f + rand() % 70;
 
-	//sf::ConvexShape shape_1 = createConvexNGon(side, 100.f, { 250, 300 });
-	ConvexNGon shape_1(side, radius);
-	sf::ConvexShape shape_1_polygon = shape_1.createConvexNGon({ X_rand,Y_rand });
+	// –ö–æ–æ—Ä–¥–∏–Ω–∞—Ç—ã –¥–ª—è –ø—Ä–∞–≤–æ–π —Ñ–∏–≥—É—Ä—ã (X ‚àà [center + padding, right - padding])
+	float X_right = (length / 2 + safePadding) + rand() % (length / 2 - 2 * static_cast<int>(safePadding)); //???
+	float Y_right = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
+
+	// –ö–æ–æ—Ä–¥–∏–Ω–∞—Ç—ã –¥–ª—è –ª–µ–≤–æ–π —Ñ–∏–≥—É—Ä—ã (X ‚àà [padding, center - padding])
+	float X_left = safePadding + rand() % (length / 2 - 2 * static_cast<int>(safePadding));
+	float Y_left = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
+
+	// –°–æ–∑–¥–∞–Ω–∏–µ 1 —Ñ–∏–≥—É—Ä—ã —Å–ª–µ–≤–∞
+	ConvexNGon shape_1(side, radius_1);
+	sf::ConvexShape shape_1_polygon = shape_1.createConvexNGon({ X_left,Y_left });
 	shape_1_polygon.setFillColor(sf::Color::Cyan);
 	shape_1_polygon.setOutlineThickness(-2.f);
 	shape_1_polygon.setOutlineColor(sf::Color::Red);
 
-	//sf::ConvexShape shape_2 = createConvexNGon(side, 100.f, { 550, 300 });
-	ConvexNGon shape_2(side, 100.f);
-	sf::ConvexShape shape_2_polygon = shape_2.createConvexNGon({ 550,300 });
+	// –°–æ–∑–¥–∞–Ω–∏–µ 1 —Ñ–∏–≥—É—Ä—ã —Å–ø—Ä–∞–≤–∞
+	ConvexNGon shape_2(side, radius_2);
+	sf::ConvexShape shape_2_polygon = shape_2.createConvexNGon({ X_right,Y_right});
 	shape_2_polygon.setFillColor(sf::Color::Green);
 	shape_2_polygon.setOutlineThickness(2.f);
 	shape_2_polygon.setOutlineColor(sf::Color::Yellow);
@@ -45,21 +63,30 @@ int main() {
 				window.close();
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
 
-				X_rand = rand() % ((length / 2) - 100 + 1) + 100;
-				Y_rand = rand() % ((width - 50) - 100 + 1) + 100;
-				side = rand() % (15 - 3 + 1) + 3;
 
-				shape_1.change_side(side);
-				shape_1_polygon = shape_1.createConvexNGon({ X_rand,Y_rand });
+				float X_left = safePadding + rand() % (length / 2 - 2 * static_cast<int>(safePadding));
+				float Y_left = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
+
+				side = rand() % (15 - 3 + 1) + 3;
+				float radius_1 = 30.f + rand() % 70;
+
+				shape_1.change_SideAndRadius(side, radius_1);
+				shape_1_polygon = shape_1.createConvexNGon({ X_left,Y_left });
 				shape_1_polygon.setFillColor(sf::Color::Cyan);
 				shape_1_polygon.setOutlineThickness(2.f);
 				shape_1_polygon.setOutlineColor(sf::Color::Red);
 			}
 
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::T) {
+
+				float X_right = (length / 2 + safePadding) + rand() % (length / 2 - 2 * static_cast<int>(safePadding));
+				float Y_right = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
+
 				side = rand() % (15 - 3 + 1) + 3;
-				shape_2.change_side(side);
-				shape_2_polygon = shape_2.createConvexNGon({ 550,300 });
+				float radius_1 = 30.f + rand() % 70;
+
+				shape_2.change_SideAndRadius(side, radius_2);
+				shape_2_polygon = shape_2.createConvexNGon({ X_right,Y_right });
 				shape_2_polygon.setFillColor(sf::Color::Green);
 				shape_2_polygon.setOutlineThickness(2.f);
 				shape_2_polygon.setOutlineColor(sf::Color::Yellow);

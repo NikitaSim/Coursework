@@ -1,4 +1,5 @@
 #include "Func.h"
+#include "ConvexNGon.h"
 
 // Алгоритм Грэхема для выпуклой оболочки
 std::vector<Point> convexHull(std::vector<Point>& points) {
@@ -34,11 +35,11 @@ std::vector<Point> convexHull(std::vector<Point>& points) {
 		hull.push_back(points[i]);
 	}
 
-	return hull;
+	return hull;//points;
 }
 
 int orientation(const Point& p, const Point& q, const Point& r) {
 	float val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-	if (val == 0) return 0;      // коллинеарны
+	if (val == 0) return 0;      // коллинеарные
 	return (val > 0) ? 1 : 2;    // 1 - по часовой, 2 - против
 }
