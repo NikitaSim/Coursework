@@ -12,6 +12,12 @@ private:
 	std::vector<Point> hull; // Указан тип
 public:
 	ConvexNGon(int s, float r) : sides(s), maxRadius(r){}
+	ConvexNGon():sides(0), maxRadius(0.f){}
+	ConvexNGon(const ConvexNGon&& moved) {
+		sides = moved.sides;
+		maxRadius = moved.maxRadius;
+		hull = moved.hull;
+}
 
 	sf::ConvexShape createConvexNGon(sf::Vector2f position);
 

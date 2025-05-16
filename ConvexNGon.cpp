@@ -40,10 +40,10 @@ sf::ConvexShape ConvexNGon::createConvexNGon(sf::Vector2f position) {
 		polygon.setPoint(i, { hull[i].x, hull[i].y });
 	}
 
-	// Центрируем фигуру
-	sf::FloatRect bounds = polygon.getLocalBounds(); //???
-	// Учитываем смещение локальных координат
-	polygon.setOrigin(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+	//// Центрируем фигуру
+	sf::FloatRect bounds = polygon.getLocalBounds();
+	//// Учитываем смещение локальных координат
+	//polygon.setOrigin(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
 	polygon.setPosition(position);
 
 	return polygon;
