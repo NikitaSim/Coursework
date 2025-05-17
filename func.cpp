@@ -58,7 +58,7 @@ int orientation(const Point& p, const Point& q, const Point& r) {
 
 bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2) {
 
-	if (points_1.empty() || points_2.empty()) return 0.0f;
+	if (points_1.empty() || points_2.empty()) return false;
 
 	std::vector<Point> normals_1 = Normals(points_1);
 	std::vector<Point> normals_2 = Normals(points_2);
@@ -66,15 +66,19 @@ bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2)
 	std::vector<Point> Normal_axis = normals_1;
 	Normal_axis.insert(Normal_axis.end(), normals_2.begin(), normals_2.end());
 	//объеденить нормали(оси) убрать повторяющиеся 
-	// Удаление дубликатов нормалей
+	//Удаление дубликатов осей.
 	std::sort(Normal_axis.begin(), Normal_axis.end(), [](const Point& a, const Point& b) {
-		return a.x < b.x || (a.x == b.x && a.y < b.y);
+		return (atan2(a.y, a.x) < atan2(b.y, b.x));
 		});
-	auto last = std::unique(Normal_axis.begin(), Normal_axis.end(),
-		[](const Point& a, const Point& b) {
-			return std::abs(a.x - b.x) < 1e-3 && std::abs(a.y - b.y) < 1e-3;
+
+	auto last = std::unique(Normal_axis.begin(), Normal_axis.end(), [](const Point& a, const Point& b) {
+		double angleA = atan2(a.y, a.x);
+		double angleB = atan2(b.y, b.x);
+		return abs(angleA - angleB) < 1e-6;
 		});
 	Normal_axis.erase(last, Normal_axis.end());
+
+	if (Normal_axis.empty()) return false;
 
 	if (Normal_axis.empty()) return 0.0f;
 
@@ -82,27 +86,14 @@ bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2)
 	std::vector<min_max_proj> min_maxProj_shape_1 = min_maxProjection(points_1, Normal_axis);
 	std::vector<min_max_proj> min_maxProj_shape_2 = min_maxProjection(points_2, Normal_axis);
 
-	//пересечение фигур
-
-	float min_distance = std::numeric_limits<float>::infinity();
-	bool is_intersecting = false;//true // Предполагаем, что фигуры пересекаются
-
 	for (size_t i = 0; i < Normal_axis.size(); i++) {
 		float overlap_start = std::max(min_maxProj_shape_1[i].minProj, min_maxProj_shape_2[i].minProj);
 		float overlap_end = std::min(min_maxProj_shape_1[i].maxProj, min_maxProj_shape_2[i].maxProj);
 
 		// Если проекции НЕ перекрываются на этой оси
-		if (overlap_start > overlap_end) {
-			/*float distance = overlap_start - overlap_end;
-			if (distance < min_distance) {
-				min_distance = distance;
-				std::cout << "New min distance on axis (" << Normal_axis[i].x << ", " << Normal_axis[i].y << "): " << distance << std::endl;
-			}*/
-			is_intersecting = true;//false // Найдена разделяющая ось
-		}
+		if (overlap_start > overlap_end) return false;//false // Найдена разделяющая ось
 	}
-
-	return is_intersecting;
+	return true;
 }
 
 

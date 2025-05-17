@@ -36,25 +36,13 @@ int main() {
 	X_2 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 	Y_2 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
 
-	//// Проверка, чтобы центры не пересекались:
-	///*while (std::abs(X_right - X_left) < 2 * safePadding) {
-	//	X_right = (length / 2 + safePadding) + rand() % (length / 2 - 2 * static_cast<int>(safePadding));
-	//}*/
-
 	// Создание 1 фигуры слева
 	ConvexNGon shape_1(side_1, radius_1);
 	sf::ConvexShape shape_1_polygon = shape_1.createConvexNGon({ X_1,Y_1 });
-	/*shape_1_polygon.setFillColor(sf::Color::Cyan);
-	shape_1_polygon.setOutlineThickness(-2.f);
-	shape_1_polygon.setOutlineColor(sf::Color::Red);*/
 
 	// Создание 1 фигуры справа
 	ConvexNGon shape_2(side_2, radius_2);
 	sf::ConvexShape shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2});
-	/*shape_2_polygon.setFillColor(sf::Color::Green);
-	shape_2_polygon.setOutlineThickness(2.f);
-	shape_2_polygon.setOutlineColor(sf::Color::Yellow);*/
-
 	//------------------------------------------------------------------------------------
 
 	const auto& points_1 = shape_1.getHullPoints();
@@ -74,7 +62,11 @@ int main() {
 	
 	bool collision = SAT(points_1_absolute, points_2_absolute);
 	
-	while (!collision) {
+	while (collision) {
+
+		points_1_absolute.clear();
+		points_2_absolute.clear();
+
 		side_1 = rand() % (15 - 3 + 1) + 3;
 		side_2 = rand() % (15 - 3 + 1) + 3;
 
@@ -85,13 +77,13 @@ int main() {
 		X_1 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 		Y_1 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
 		// Создание 1 фигуры слева
-		ConvexNGon shape_1(side_1, radius_1);
+		shape_1.change_SideAndRadius(side_1, radius_1);
 		shape_1_polygon = shape_1.createConvexNGon({ X_1,Y_1 });
 
 		X_2 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 		Y_2 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
 		// Создание 1 фигуры справа
-		ConvexNGon shape_2(side_2, radius_2);
+		shape_2.change_SideAndRadius(side_2, radius_2);
 		shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2 });
 
 		////
@@ -110,8 +102,6 @@ int main() {
 		collision = SAT(points_1_absolute, points_2_absolute);
 
 	}
-	/*min_dist = SAT(points_1_absolute, points_2_absolute);
-	std::cout <<"minimum distance between shapes: " << min_dist << std::endl;*/
 
 	shape_1_polygon.setFillColor(sf::Color::Cyan);
 	shape_1_polygon.setOutlineThickness(-2.f);
@@ -162,7 +152,6 @@ int main() {
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
 
 				points_1_absolute.clear();
-				points_2_absolute.clear();
 
 				X_1 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 				Y_1 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
@@ -174,18 +163,17 @@ int main() {
 				shape_1_polygon = shape_1.createConvexNGon({ X_1,Y_1 });
 
 				const auto& points_1 = shape_1.getHullPoints();
-				const auto& points_2 = shape_2.getHullPoints();
 
 				for (const auto& p : points_1) {
 					points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
 				}
-				for (const auto& p : points_2) {
-					points_2_absolute.push_back({ X_2 + p.x, Y_2 + p.y });
-				}
 
 				collision = SAT(points_1_absolute, points_2_absolute);
 
-				while (!collision) {
+				while (collision) {
+
+					points_1_absolute.clear();
+
 					X_1 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 					Y_1 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
 
@@ -196,13 +184,9 @@ int main() {
 					shape_1_polygon = shape_1.createConvexNGon({ X_1,Y_1 });
 
 					const auto& points_1 = shape_1.getHullPoints();
-					const auto& points_2 = shape_2.getHullPoints();
 
 					for (const auto& p : points_1) {
 						points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
-					}
-					for (const auto& p : points_2) {
-						points_2_absolute.push_back({ X_2 + p.x, Y_2 + p.y });
 					}
 
 					collision = SAT(points_1_absolute, points_2_absolute);
@@ -229,7 +213,6 @@ int main() {
 
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::T) {
 
-				points_1_absolute.clear();
 				points_2_absolute.clear();
 
 				X_2 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
@@ -241,19 +224,18 @@ int main() {
 				shape_2.change_SideAndRadius(side_2, radius_2);
 				shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2 });
 
-				const auto& points_1 = shape_1.getHullPoints();
 				const auto& points_2 = shape_2.getHullPoints();
 
-				for (const auto& p : points_1) {
-					points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
-				}
 				for (const auto& p : points_2) {
 					points_2_absolute.push_back({ X_2 + p.x, Y_2 + p.y });
 				}
 
 				collision = SAT(points_1_absolute, points_2_absolute);
 
-				while (!collision) {
+				while (collision) {
+
+					points_2_absolute.clear();
+
 					X_2 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
 					Y_2 = safePadding + rand() % (width - 2 * static_cast<int>(safePadding));
 
@@ -263,12 +245,8 @@ int main() {
 					shape_2.change_SideAndRadius(side_2, radius_2);
 					shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2 });
 
-					const auto& points_1 = shape_1.getHullPoints();
 					const auto& points_2 = shape_2.getHullPoints();
 
-					for (const auto& p : points_1) {
-						points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
-					}
 					for (const auto& p : points_2) {
 						points_2_absolute.push_back({ X_2 + p.x, Y_2 + p.y });
 					}
