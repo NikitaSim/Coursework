@@ -56,7 +56,7 @@ int orientation(const Point& p, const Point& q, const Point& r) {
 //	float maxProj;
 //};
 
-bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2) {
+bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2) { //Separating Axis Theorem
 
 	if (points_1.empty() || points_2.empty()) return false;
 

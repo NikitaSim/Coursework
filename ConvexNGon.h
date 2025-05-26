@@ -17,7 +17,8 @@ public:
 		sides = moved.sides;
 		maxRadius = moved.maxRadius;
 		hull = moved.hull;
-}
+		// открыть лекции и написать все 5 конструкторов
+	}
 
 	sf::ConvexShape createConvexNGon(sf::Vector2f position);
 
