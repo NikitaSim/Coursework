@@ -40,11 +40,25 @@ sf::ConvexShape ConvexNGon::createConvexNGon(sf::Vector2f position) {
 		polygon.setPoint(i, { hull[i].x, hull[i].y });
 	}
 
-	//// Центрируем фигуру
-	sf::FloatRect bounds = polygon.getLocalBounds();
-	//// Учитываем смещение локальных координат
-	//polygon.setOrigin(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
 	polygon.setPosition(position);
+
+	return polygon;
+}
+
+sf::ConvexShape ConvexNGon::createConvexNGonOwnPoints(sf::Vector2f position, const std::vector<Point>& points) {
+	sf::ConvexShape polygon;
+	std::vector<Point> points_ = points;
+	// Построение выпуклой оболочки
+	hull = convexHull(points_);
+	if (hull.size() < 3) return polygon; // Защита от ошибок
+
+	// Настройка многоугольника
+	polygon.setPointCount(hull.size());
+	for (size_t i = 0; i < hull.size(); ++i) {
+		polygon.setPoint(i, { hull[i].x, hull[i].y });
+	}
+
+	//polygon.setPosition(position);
 
 	return polygon;
 }

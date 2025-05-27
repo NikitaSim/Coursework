@@ -8,7 +8,7 @@ sf::VertexArray Line::CreateLine() const {
 	line[0].position = sf::Vector2f(vertex_start.x, vertex_start.y);
 	line[1].position = sf::Vector2f(vertex_end.x, vertex_end.y);
 
-	line[0].color = sf::Color::Red;
+    line[0].color = sf::Color::Red;
 	line[1].color = sf::Color::Red;
 
 	return line;

@@ -7,7 +7,7 @@ class Point;
 
 Distance minDistance(const std::vector<Point>& shape_1, const std::vector<Point>& shape_2) {
 	if (shape_1.empty() || shape_2.empty()) {
-		return { 0.0f, Point(), Point() }; // Корректная инициализация
+		return { 0.0f, Point(), Point() };
 	}
 
 	float min_sq = std::numeric_limits<float>::max();
@@ -28,7 +28,8 @@ Distance minDistance(const std::vector<Point>& shape_1, const std::vector<Point>
 		}
 	}
 
-	// Вывод информации (опционально)
+	// Вывод информации
+	std::cout << "Minimum distance line points" << std::endl;
 	std::cout << "shape 1 X: " << start.x << " Y: " << start.y << "\n"
 		<< "shape 2 X: " << end.x << " Y: " << end.y << std::endl;
 
@@ -38,7 +39,7 @@ Distance minDistance(const std::vector<Point>& shape_1, const std::vector<Point>
 Distance maxDistance(const std::vector<Point>& shape_1, const std::vector<Point>& shape_2) {
 
 	if (shape_1.empty() || shape_2.empty()) {
-		return { 0.0f, Point(), Point() }; // Корректная инициализация
+		return { 0.0f, Point(), Point() };
 	}
 
 	float maxlen = std::numeric_limits<float>::lowest();
@@ -58,8 +59,9 @@ Distance maxDistance(const std::vector<Point>& shape_1, const std::vector<Point>
 		}
 	}
 
+	std::cout << "Maximum distance line points" << std::endl;
 	std::cout << "shape 1 X: " << start.x << " Y: " << start.y << "\n"
-		<< "shape 2 X: " << end.x << "Y: " << end.y << std::endl;
+		<< "shape 2 X: " << end.x << " Y: " << end.y << std::endl;
 
 	return { std::sqrt(maxlen), start, end };
 }

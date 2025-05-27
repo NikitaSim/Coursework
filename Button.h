@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>  // Для графических компонентов (RectangleShape, Text, Font)
-#include <functional>         // Для std::function и лямбда-выражений
-#include <string>             // Для работы со строками
-#include <iostream>  
+#include <SFML/Graphics.hpp>
+#include <functional>
+#include <string>
+#include <iostream>
 
 class Button {
 private:

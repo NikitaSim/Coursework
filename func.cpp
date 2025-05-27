@@ -51,11 +51,6 @@ int orientation(const Point& p, const Point& q, const Point& r) {
 	return (val > 0) ? 1 : 2;    // 1 - по часовой, 2 - против
 }
 
-//struct min_max_proj {
-//	float minProj;
-//	float maxProj;
-//};
-
 bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2) { //Separating Axis Theorem
 
 	if (points_1.empty() || points_2.empty()) return false;
@@ -65,7 +60,7 @@ bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2)
 
 	std::vector<Point> Normal_axis = normals_1;
 	Normal_axis.insert(Normal_axis.end(), normals_2.begin(), normals_2.end());
-	//объеденить нормали(оси) убрать повторяющиеся 
+	//объединить нормали(оси) убрать повторяющиеся 
 	//Удаление дубликатов осей.
 	std::sort(Normal_axis.begin(), Normal_axis.end(), [](const Point& a, const Point& b) {
 		return (atan2(a.y, a.x) < atan2(b.y, b.x));
@@ -82,7 +77,6 @@ bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2)
 
 	if (Normal_axis.empty()) return 0.0f;
 
-	//массивы структур
 	std::vector<min_max_proj> min_maxProj_shape_1 = min_maxProjection(points_1, Normal_axis);
 	std::vector<min_max_proj> min_maxProj_shape_2 = min_maxProjection(points_2, Normal_axis);
 
@@ -91,7 +85,7 @@ bool SAT(const std::vector<Point>& points_1, const std::vector<Point>& points_2)
 		float overlap_end = std::min(min_maxProj_shape_1[i].maxProj, min_maxProj_shape_2[i].maxProj);
 
 		// Если проекции НЕ перекрываются на этой оси
-		if (overlap_start > overlap_end) return false;//false // Найдена разделяющая ось
+		if (overlap_start > overlap_end) return false; // Найдена разделяющая ось
 	}
 	return true;
 }

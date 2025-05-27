@@ -11,8 +11,13 @@
 #include "text.h"
 #include "Button.h"
 
-int main() {
+/* ЗАДАНИЕ
+На плоскости задаются 2 непересекающиеся фигуры. 
+Найти между ними минимальное и максимальное расстояния. 
+*/
 
+int main() {
+	// Объявление и инициализация некоторых переменных и объектов
 	int length = 800; //x
 	int	width = 600; //y
 
@@ -23,11 +28,12 @@ int main() {
 
 	bool show_min_line = false;
 	bool show_max_line = false;
+	bool collision_flag = true;
 
 	sf::VertexArray line_scale(sf::Lines, 2);
 	sf::RectangleShape lineShape;
 
-	Line scale({ 20,580}, { 120,580 });
+	Line scale({ 20,580 }, { 120,580 });
 	line_scale = scale.CreateLine();
 
 	Line rectangle({ 150,450 }, { 150,550 });
@@ -53,7 +59,7 @@ int main() {
 	sf::RenderWindow instrument_menu(sf::VideoMode(300, 400), "Menu");
 	instrument_menu.setFramerateLimit(60);
 
-	//// Задаем безопасные границы для центра фигуры
+	// Задаем безопасные границы для центра фигуры
 	float safePadding = 100.f; // Минимальное расстояние от краев экрана
 
 	int side_1, side_2;
@@ -61,7 +67,7 @@ int main() {
 	srand(time(0));
 
 	//----------------------------------------------------------------------------------------//
-
+	// задание 0 генерации фигур и проверка их на пересечение
 	side_1 = rand() % (15 - 3 + 1) + 3;
 	side_2 = rand() % (15 - 3 + 1) + 3;
 
@@ -83,9 +89,10 @@ int main() {
 
 	// Создание 1 фигуры справа
 	ConvexNGon shape_2(side_2, radius_2);
-	sf::ConvexShape shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2});
-	//------------------------------------------------------------------------------------
+	sf::ConvexShape shape_2_polygon = shape_2.createConvexNGon({ X_2,Y_2 });
 
+	//------------------------------------------------------------------------------------
+	//получение абсолютных координат
 	const auto& points_1 = shape_1.getHullPoints();
 	std::vector<Point> points_1_absolute;
 	for (const auto& p : points_1) {
@@ -99,10 +106,9 @@ int main() {
 	}
 	//--------------------------------------------------------------------------------------
 
-	//получение абсолютных координат
-	
+	// цикл проверки пересечения фигур 
 	bool collision = SAT(points_1_absolute, points_2_absolute);
-	
+
 	while (collision) {
 
 		points_1_absolute.clear();
@@ -129,17 +135,17 @@ int main() {
 
 		////
 		const auto& points_1 = shape_1.getHullPoints();
-		std::vector<Point> points_1_absolute;
+		//std::vector<Point> points_1_absolute;
 		for (const auto& p : points_1) {
 			points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
 		}
-		
+
 		const auto& points_2 = shape_2.getHullPoints();
-		std::vector<Point> points_2_absolute;
+		//std::vector<Point> points_2_absolute;
 		for (const auto& p : points_2) {
 			points_2_absolute.push_back({ X_2 + p.x, Y_2 + p.y });
 		}
-	
+
 		collision = SAT(points_1_absolute, points_2_absolute);
 
 	}
@@ -170,9 +176,80 @@ int main() {
 	Button btnD(sf::Vector2f(120, 40), sf::Vector2f(20, 20), "Show Distance", "Distance: ");
 	Button btnR(sf::Vector2f(120, 40), sf::Vector2f(20, 120), "Reset Left");
 	Button btnT(sf::Vector2f(120, 40), sf::Vector2f(20, 180), "Reset Right");
+	Button btn_customEnter(sf::Vector2f(120, 40), sf::Vector2f(20, 230), "Custom Enter");
 
 	// Настройка действий для кнопок
-	btnD.setAction([&]() {
+	btn_customEnter.setAction([&]() { // пользовательский ввод
+
+		system("cls");
+
+		points_1_absolute.clear();
+		points_2_absolute.clear();
+
+		std::vector<Point> points_shape_1;
+		std::cout << "Enter position of shape 1 (X,Y)" << std::endl;
+		std::cin >> X_1 >> Y_1;
+		std::cout << "Enter side of your shape 1: ";
+		std::cin >> side_1;
+
+		float point_x, point_y;
+		for (int i = 0; i < side_1; i++) {
+			std::cout << "Enter " << i + 1 << " point(X,Y): ";
+			std::cin >> point_x >> point_y;
+			points_shape_1.push_back({ point_x, point_y });
+		}
+
+		shape_1.change_SideAndRadius(side_1, 0.f);
+		shape_1_polygon = shape_1.createConvexNGonOwnPoints({ X_1,Y_1 }, points_shape_1);
+
+		std::vector<Point> points_shape_2;
+		std::cout << "Enter position of shape 2 (X,Y)" << std::endl;
+		std::cin >> X_2 >> Y_2;
+		std::cout << "Enter side of your shape 2: ";
+		std::cin >> side_2;
+
+		for (int i = 0; i < side_2; i++) {
+			std::cout << "Enter " << i + 1 << " point(X,Y): ";
+			std::cin >> point_x >> point_y;
+			points_shape_2.push_back({ point_x, point_y });
+		}
+
+		shape_2.change_SideAndRadius(side_2, 0.f);
+		shape_2_polygon = shape_2.createConvexNGonOwnPoints({ X_2,Y_2 }, points_shape_2);
+
+		// ПРОВЕРКА НА SAT
+		points_1_absolute.clear();
+		for (const auto& p : shape_1.getHullPoints()) {
+			points_1_absolute.push_back({ p.x, p.y }); // Уже с учётом позиции
+		}
+
+		points_2_absolute.clear();
+		for (const auto& p : shape_2.getHullPoints()) {
+			points_2_absolute.push_back({ p.x, p.y });
+		}
+		//const auto& points_2 = shape_2.getHullPoints();
+		////std::vector<Point> points_2_absolute;
+		//for (const auto& p : points_2) {
+		//	points_2_absolute.push_back({ X_2, Y_2 });
+		//}
+
+		collision = SAT(points_1_absolute, points_2_absolute);
+		collision_flag = !collision;
+
+		shape_1_polygon.setFillColor(sf::Color::Cyan); // этот блок в отдельную функцию(метод)
+		shape_1_polygon.setOutlineThickness(-2.f);
+		shape_1_polygon.setOutlineColor(sf::Color::Red);
+
+		shape_2_polygon.setFillColor(sf::Color::Green);
+		shape_2_polygon.setOutlineThickness(-2.f);
+		shape_2_polygon.setOutlineColor(sf::Color::Yellow);
+
+		show_min_line = false;
+		show_max_line = false;
+
+		});
+
+	btnD.setAction([&]() { // определение расстояния
 		Distance min_distance = minDistance(points_1_absolute, points_2_absolute);
 		Distance max_distance = maxDistance(points_1_absolute, points_2_absolute);
 
@@ -192,9 +269,8 @@ int main() {
 		show_max_line = true;
 		});
 
-	btnR.setAction([&]() {
-		// Код обновления левой фигуры (как для клавиши R)
-		// ...
+	btnR.setAction([&]() { // создание 1 фигуры
+
 		points_1_absolute.clear();
 
 		X_1 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
@@ -242,6 +318,7 @@ int main() {
 
 		show_min_line = false;
 		show_max_line = false;
+		collision_flag = true;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		system("cls");
@@ -255,15 +332,10 @@ int main() {
 		for (const auto& p : points_2) {
 			std::cout << "X: " << p.x << ", Y: " << p.y << std::endl;
 		}
-
-		show_min_line = false;
-		show_max_line = false;
-		//btnD.setInfo("Distance: ");
 		});
 
-	btnT.setAction([&]() {
-		// Код обновления правой фигуры (как для клавиши T)
-		// ...
+	btnT.setAction([&]() { // создание 2 фигуры
+		
 		points_2_absolute.clear();
 
 		X_2 = safePadding + rand() % (length - 2 * static_cast<int>(safePadding));
@@ -311,6 +383,7 @@ int main() {
 
 		show_min_line = false;
 		show_max_line = false;
+		collision_flag = true;
 
 		////////////////////////////////////////////////////////////////////////////////////
 		system("cls");
@@ -325,9 +398,6 @@ int main() {
 			std::cout << "X: " << p.x << ", Y: " << p.y << std::endl;
 		}
 
-		show_min_line = false;
-		show_max_line = false;
-		//bbtnD.setInfo("Distance: ");
 		});
 
 	while (window.isOpen() && instrument_menu.isOpen()) {
@@ -362,10 +432,6 @@ int main() {
 				std::vector<Point> points_1_absolute;
 				for (const auto& p : points_1) {
 					points_1_absolute.push_back({ X_1 + p.x, Y_1 + p.y });
-				}
-				std::cout << "Hull points shape 1 (" << points_1_absolute.size() << "):" << std::endl;
-				for (const auto& p : points_1_absolute) {
-					std::cout << "X: " << p.x << ", Y: " << p.y << std::endl;
 				}
 
 				const auto& points_2 = shape_2.getHullPoints();
@@ -427,6 +493,7 @@ int main() {
 
 				show_min_line = false;
 				show_max_line = false;
+				collision_flag = true;
 
 				////////////////////////////////////////////////////////////////////////////////////
 				system("cls");
@@ -492,6 +559,7 @@ int main() {
 
 				show_min_line = false;
 				show_max_line = false;
+				collision_flag = true;
 
 				////////////////////////////////////////////////////////////////////////////////////
 				system("cls");
@@ -518,6 +586,7 @@ int main() {
 					btnD.click();
 					btnR.click();
 					btnT.click();
+					btn_customEnter.click();
 				}
 			}
 		}
@@ -526,12 +595,18 @@ int main() {
 		btnD.update(mousePos);
 		btnR.update(mousePos);
 		btnT.update(mousePos);
+		btn_customEnter.update(mousePos);
 
 		instrument_menu.clear(sf::Color::White);
 		window.clear(sf::Color::Black);
 
-		window.draw(shape_1_polygon);
-		window.draw(shape_2_polygon);
+		if (collision_flag) {
+			window.draw(shape_1_polygon);
+			window.draw(shape_2_polygon);
+		}
+		else {
+			std::cout << "!!!Figures have intersections!!!" << std::endl;
+		}
 
 		window.draw(line_scale);
 
@@ -546,6 +621,7 @@ int main() {
 		btnD.draw(instrument_menu);
 		btnR.draw(instrument_menu);
 		btnT.draw(instrument_menu);
+		btn_customEnter.draw(instrument_menu);
 		
 		window.display();
 		instrument_menu.display();

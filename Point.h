@@ -35,4 +35,3 @@ public:
 	friend Distance minDistance(const std::vector<Point>&, const std::vector<Point>&);
 	friend Distance maxDistance(const std::vector<Point>&, const std::vector<Point>&);
 };
-

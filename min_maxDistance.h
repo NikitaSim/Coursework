@@ -14,6 +14,5 @@ struct Distance {
     }
 };
 
-// Убедимся, что сигнатуры функций уникальны
 Distance minDistance(const std::vector<Point>&, const std::vector<Point>&);
 Distance maxDistance(const std::vector<Point>&, const std::vector<Point>&); // Теперь это две разные функции
